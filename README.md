@@ -23,12 +23,8 @@ This repo is for rso tracking but currently has only visulaization utils. Full c
 
 - Besides, labelinig files in Basic dataset are two versions even in the same set.
     - {YYMMDD}_{StartTime}_{EndTime}_cropped_{seq}.txt
-    - {YYMMDD}_{StartTime}_{EndTime}_cropped_{seq}.txt
+    - {YYMMDD}_{StartTime}_{EndTime}_cropped_truth_{seq}.txt
 
-```python
-- 20230116_212414_212846_cropped_169.txt
-- 20230805_233614_234046_cropped_truth_1.txt
-```
 
 - Lastly, sequnce has different number of digits, so we can’t apply sort() function on that.
     - {YYMMDD}_{StartTime}_{EndTime}_cropped_1.txt, …, {YYMMDD}_{StartTime}_{EndTime}_cropped_10.txt, …, {YYMMDD}_{StartTime}_{EndTime}_cropped_100.txt

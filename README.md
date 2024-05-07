@@ -22,12 +22,15 @@ This repo is for rso tracking but currently has only visulaization utils. Full c
 ```
 
 - Besides, labelinig files in Basic dataset are two versions even in the same set.
-    - {YYMMDD}_{StartTime}_{EndTime}_cropped_{seq}.txt
-    - {YYMMDD}_{StartTime}_{EndTime}_cropped_truth_{seq}.txt
+    - `{YYMMDD}_{StartTime}_{EndTime}_cropped_{seq}.txt`
+    - `{YYMMDD}_{StartTime}_{EndTime}_cropped_truth_{seq}.txt`
 
 
 - Lastly, sequnce has different number of digits, so we can’t apply sort() function on that.
-    - {YYMMDD}_{StartTime}_{EndTime}_cropped_1.txt, …, {YYMMDD}_{StartTime}_{EndTime}_cropped_10.txt, …, {YYMMDD}_{StartTime}_{EndTime}_cropped_100.txt
+    - `{YYMMDD}_{StartTime}_{EndTime}_cropped_1.txt`
+    - `{YYMMDD}_{StartTime}_{EndTime}_cropped_10.txt`
+    - ...
+    - `{YYMMDD}_{StartTime}_{EndTime}_cropped_100.txt`
 
 - So, `01.convert_FAI_to_MOT.py` is the code to convert these dataset to MOT dataset format like the belows.
 

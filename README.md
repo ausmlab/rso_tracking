@@ -36,8 +36,13 @@ This repo is for rso tracking but currently has only visulaization utils. Full c
 
 ```python
 # example of the script
-$ python preprocessing/convert_FAI_to_MOT.py --dataset basic --video_dir {path/of/FAI_Basic} --save_dir ./data/basic_mot
-$ python preprocessing/convert_FAI_to_MOT.py --dataset advanced --video_dir {path/of/FAI_Advanced} --save_dir ./data/advanced_mot
+$ python preprocessing/convert_FAI_to_MOT.py --dataset basic\
+	--video_dir {path/of/FAI_Basic}\
+	--save_dir ./data/basic_mot
+$ python preprocessing/convert_FAI_to_MOT.py --dataset advanced\
+	--video_dir {path/of/FAI_Advanced}\
+	--save_dir ./data/advanced_mot
+
 # output
 -- <ROOT>
 	|-- {Video_Root}
@@ -56,7 +61,7 @@ $ python preprocessing/convert_FAI_to_MOT.py --dataset advanced --video_dir {pat
 # example of the script
 $ python preprocessing/make_det_dataset.py --option add_curr
 # output
-
+```
 
 
 

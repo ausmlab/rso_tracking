@@ -3,7 +3,7 @@ This repo is for rso tracking but currently has only visulaization utils. Full c
 
 # 1. Data Preprocessing
 
-### convert file structure to MoT Style
+### 1.1. convert file structure to MoT Style
 
 - Basic and Advanced dataset has differect path and naming structure.
 
@@ -26,74 +26,89 @@ This repo is for rso tracking but currently has only visulaization utils. Full c
     - `{YYMMDD}_{StartTime}_{EndTime}_cropped_truth_{seq}.txt`
 
 
-- Lastly, sequnce has different number of digits, so we can’t apply sort() function on that.
+- Lastly, sequnce has different number of digits, so we can't apply sort() function on that.
     - `{YYMMDD}_{StartTime}_{EndTime}_cropped_1.txt`
     - `{YYMMDD}_{StartTime}_{EndTime}_cropped_10.txt`
     - ...
     - `{YYMMDD}_{StartTime}_{EndTime}_cropped_100.txt`
 
-- So, `convert_FAI_to_MOT.py` is the code to convert these dataset to MOT dataset format like the belows.
+- `convert_FAI_to_MOT.py` is the code to convert structure of these dataset to MOT dataset format like the belows.
+    - please note that bbox format of gt is still following yolo style.
 
 ```python
 # example of the script
-$ python preprocessing/convert_FAI_to_MOT.py --dataset basic\
-	--video_dir {path/of/FAI_Basic}\
-	--save_dir ./data/basic_mot
-$ python preprocessing/convert_FAI_to_MOT.py --dataset advanced\
-	--video_dir {path/of/FAI_Advanced}\
-	--save_dir ./data/advanced_mot
+$ python preprocessing/convert_FAI_to_MOT.py --dataset basic \
+	--video_dir {path/of/FAI_DATA}/FAI_Basic_Dataset_MOT/Images
+$ python preprocessing/convert_FAI_to_MOT.py --dataset advanced \
+	--video_dir {path/of/FAI_DATA}/FAI_Advanced_Dataset
 
 # output
--- <ROOT>
+-- data/{basic/advanced}_mot
 	|-- {Video_Root}
 		|-- img1 #Paths_of_Images
 		`-- gt # Paths_of_Labels
 ```
 
 
-### make two seqs and convert labels to coco style
-- We make new images with two consecutive images because detector is not trained on set of single frame.
+### 1.2. make two seqs and convert labels to coco style
+- We make new images with two consecutive images because detector is not trained on set of single frame
     - We assume that difference of moving pattern between Star and RSO can be trained by deep learning model.
 - And, we need to make annotatino format of label file to coco-style to train detector at `mmdetectino` tool.
 - Traning and Testing Outputs will be saved under `./data/TWO_SEQs/' respectively.
     - we assume source data is outputs of `convert_FAI_to_MOT.py` so they are under `./data/basic_mot` and `./data/advanced_mot`
 ```python
-# example of the script
-$ python preprocessing/make_det_dataset.py --option add_curr
+# example of the script for detection
+$ python preprocessing/make_det_2seqs.py --option add_curr
+
 # output
+## for detection
+-- data/DET_COCO_STYLE_TWOs/{option}
+        |-- train
+        |       |-- {train_image_file1.png}
+        |       |-- ...
+        |       `-- annotation_coco.json
+        `-- test
+                |-- {test_image_file1.png}
+                |-- ...
+                `-- annotation_coco.json
+
+## for tracking
+-- data/Tracking_GT_TWO_SEQs
+        |-- {Video_Root}
+                |-- gt.txt
+
 ```
-
-
 
 
 # 2. Training detector
 - We used `mmdetection` tool to train detector
     - https://github.com/open-mmlab/mmdetection
-- After install mmdetection, use `config/FAI/yolox_nano_2seqs.py
+- After install mmdetection, use `config/yolox_nano_2seqs.py
 - When training the model, we use pretrained weights which is in `yolox-nano`
 
 ```python
-# example of the script in root of mmdetection
+# example of the script at root of mmdetection
 $ cd {path/of/mmdetection}
-$ python tools/train.py  {path/to/rso_tracking}/config/FAI/yolox_nano_2seqs.py
+$ python tools/train.py  {path/to/rso_tracking}/config/yolox_nano_2seqs.py
 ```
 
 # 3. Detection with Tracking
 - This code will detects and track RSOs with traiend detector and keypoint(Center) based Tracker
     - To detect RSOs, we use `mmdetection` API
-
+    - This code works on CPU not GPU.
 ```python
-# example of the script
+# example of the script at root of rso_tracking
 $ cd {path/to/rso_tracking}
-$ python detectint_with_tracking.py  --config config/FAI/yolox_nano_2seqs.py --model {path/to/mmdetection}/work_dirs/FAI_yolox_nano_2seqs/epoch_300.pth --data ./data/TWO_SEQs  --save_dir ./preds/yolox_nano
+$ python detection_with_tracking.py --score_th 0.3 --config config/yolox_nano_2seqs.py --model {path/to/mmdetection}/work_dirs/FAI_yolox_nano_2seqs/epoch_300.pth --data ./data/DET_COCO_STYLE_TWOs/ADDCURR/test --save_dir ./preds/yolox_nano
 ```
-
 
 # 4. Evaluation
 - This code will evaluate detecting and tracking performance
+- We used motmetrics library to measure tracking performance
+    - To install it, please refer to https://github.com/cheind/py-motmetrics
 ```python
 # example of the script
-$ python evaluate.py  --gt ./data/??? --preds_dir ./preds/yolox_nano
+$ python evaluate.py  --gt ./data/Tracking_GT_TWO_SEQs --preds_dir ./preds/yolox_nano
 ```
 
 # 5. Visualization utils

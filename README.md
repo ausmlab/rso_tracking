@@ -1,11 +1,11 @@
 # rso_tracking
-This repo is for rso tracking but currently has only visulaization utils. Full codes will be updated after publication.
+This repository contains the official code for the paper, ""
 
 # 1. Data Preprocessing
 
 ### 1.1. convert file structure to MoT Style
 
-- Basic and Advanced dataset has differect path and naming structure.
+- The Basic and Advanced datasets have differect path and naming structures.
 
 ```python
 # BASIC
@@ -21,19 +21,19 @@ This repo is for rso tracking but currently has only visulaization utils. Full c
 		`-- texts # Paths_of_Labels
 ```
 
-- Besides, labelinig files in Basic dataset are two versions even in the same set.
+- Additionally, the labeling files in the Basic dataset have two versions, even within the same dataset.
     - `{YYMMDD}_{StartTime}_{EndTime}_cropped_{seq}.txt`
     - `{YYMMDD}_{StartTime}_{EndTime}_cropped_truth_{seq}.txt`
 
 
-- Lastly, sequnce has different number of digits, so we can't apply sort() function on that.
+- Lastly, the sequences have different numbers of digits, preventing the use of the `sort()` function on them.
     - `{YYMMDD}_{StartTime}_{EndTime}_cropped_1.txt`
     - `{YYMMDD}_{StartTime}_{EndTime}_cropped_10.txt`
     - ...
     - `{YYMMDD}_{StartTime}_{EndTime}_cropped_100.txt`
 
-- `convert_FAI_to_MOT.py` is the code to convert structure of these dataset to MOT dataset format like the belows.
-    - please note that bbox format of gt is still following yolo style.
+- `convert_FAI_to_MOT.py` is the script that converts the structure of these datasets to MOT dataset structure, as shown below.
+    - Please note that the bounding box format of the ground truth (gt) still follows the YOLO style
 
 ```python
 # example of the script
@@ -50,12 +50,12 @@ $ python preprocessing/convert_FAI_to_MOT.py --dataset advanced \
 ```
 
 
-### 1.2. make two seqs and convert labels to coco style
-- We make new images with two consecutive images because detector is not trained on set of single frame
-    - We assume that difference of moving pattern between Star and RSO can be trained by deep learning model.
-- And, we need to make annotatino format of label file to coco-style to train detector at `mmdetectino` tool.
-- Traning and Testing Outputs will be saved under `./data/TWO_SEQs/' respectively.
-    - we assume source data is outputs of `convert_FAI_to_MOT.py` so they are under `./data/basic_mot` and `./data/advanced_mot`
+### 1.2. create two seqs images and convert labels to coco style
+- We create new images using two consecutive frames because the detector is not trained on single-frame sets.
+    - We assume that difference of moving patterns between Stars and RSOs can be trained by deep learning model.
+- And, we need to convert annotation format of the label file to coco-style to train the detector using `mmdetection` tool.
+- Traning and Testing Outputs will be saved under `./data/TWO_SEQs/` respectively.
+    - we assume the source data are outputs of `convert_FAI_to_MOT.py`, so they are located under `./data/basic_mot` and `./data/advanced_mot`
 ```python
 # example of the script for detection
 $ python preprocessing/make_det_2seqs.py --option add_curr
@@ -81,10 +81,10 @@ $ python preprocessing/make_det_2seqs.py --option add_curr
 
 
 # 2. Training detector
-- We used `mmdetection` tool to train detector
+- We used `mmdetection` tool to train the detector
     - https://github.com/open-mmlab/mmdetection
-- After install mmdetection, use `config/yolox_nano_2seqs.py
-- When training the model, we use pretrained weights which is in `yolox-nano`
+- After installing `mmdetection`, use `config/yolox_nano_2seqs.py` to train the model
+- When training the model, we'll use weights pretrained by authors of yolox, located in `pretrained_weights`
 
 ```python
 # example of the script at root of mmdetection
@@ -93,9 +93,9 @@ $ python tools/train.py  {path/to/rso_tracking}/config/yolox_nano_2seqs.py
 ```
 
 # 3. Detection with Tracking
-- This code will detects and track RSOs with traiend detector and keypoint(Center) based Tracker
+- This code will detects and track RSOs using a traiend detector and a keypoint(Center) based Tracker
     - To detect RSOs, we use `mmdetection` API
-    - This code works on CPU not GPU.
+    - This code works on CPU, not GPU.
 ```python
 # example of the script at root of rso_tracking
 $ cd {path/to/rso_tracking}
@@ -103,8 +103,8 @@ $ python detection_with_tracking.py --score_th 0.3 --config config/yolox_nano_2s
 ```
 
 # 4. Evaluation
-- This code will evaluate detecting and tracking performance
-- We used motmetrics library to measure tracking performance
+- This code will evaluate the performance of detecting and tracking.
+- We used `motmetrics` library to measure tracking performance
     - To install it, please refer to https://github.com/cheind/py-motmetrics
 ```python
 # example of the script
@@ -112,40 +112,30 @@ $ python evaluate.py  --gt ./data/Tracking_GT_TWO_SEQs --preds_dir ./preds/yolox
 ```
 
 # 5. Visualization utils
-### 01.draw_gts_on_image.py 
+### 01.draw_bboxes.py 
 
-- This code will draw bounding boxes and tracking IDs of ground truth on coressponding image and save it to `save_dir`
-    - It assumes that the path structure of `video_dir` follows the `MOT` dataset format
-
-```python
-# example of the script
-$ python 01.draw_gts_on_image.py  --video_dir ./data/basic_mot --save_dir ./visualization/basic_gt
-```
-
-### 02.draw_preds_on_image.py 
-
-- This code will draw bounding boxes and tracking IDs of predictions by ours on coressponding image and save it to `save_dir`
-    - It assumes that the path structure of `video_dir` follows the `MOT` dataset format.
+- This code will draw bounding boxes and tracking IDs on coressponding image and save it to `save_dir`
 
 ```python
 # example of the script
-$ python 02.draw_preds_on_image.py  --video_dir ./data/DET_COCO_STYLE_TWO_SEQs/test --preds_dir ./output/yolox_nano --save_dir ./visualization/basic_preds
+$ python vis_utils/01.draw_bboxes.py --image_dir ./data/DET_COCO_STYLE_TWOs/ADDCURR/test --save_dir ./vis_output/gt --bbox_dir ./data/Tracking_GT_TWO_SEQs --ouput gt
+$ python vis_utils/01.draw_bboxes.py --image_dir ./data/DET_COCO_STYLE_TWOs/ADDCURR/test --save_dir ./vis_output/pred --bbox_dir ./preds/yolox_nano --ouput pred
 ```
 
-### 03.merge_gt_preds.py
+### 02.merge_gt_preds.py
 
 - This code will merge `gt` output and `prediction` output into one image where left side will be on GT, and right side on prediction.
 
 ```python
 # example of the script
-$ python 03.merge_gt_preds.py --gt ./visualization/basic_gt --pred ./visualization/basic_preds --save_dir ./visualization/basic_merge
+$ python vis_utils/02.merge_gt_preds.py --gt ./vis_output/gt --pred ./vis_output/pred --save_dir ./vis_output/merge
 ```
 
-### 04.make_mp4.py
+### 03.make_mp4.py
 
 - This code will make movie file with any given images
 
 ```python
 # example of the script
-$ python 04.make_mp4.py --source ./visualization/basic_merge --fps 5 --save_dir ./visualization/basic_fn_mov
+$ python vis_utils/03.make_mp4.py --source ./vis_output/merge --fps 5 --out ./vis_output/outputs.mp4
 ```

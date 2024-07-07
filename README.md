@@ -108,7 +108,7 @@ $ python detection_with_tracking.py --score_th 0.3 --config config/yolox_nano_2s
     - To install it, please refer to https://github.com/cheind/py-motmetrics
 ```python
 # example of the script
-$ python evaluate.py  --gt ./data/Tracking_GT_TWO_SEQs --preds_dir ./preds/yolox_nano
+$ python evaluate.py  --gt ./data/Tracking_GT_TWO_SEQs --pred ./preds/yolox_nano
 ```
 
 # 5. Visualization utils
@@ -118,8 +118,8 @@ $ python evaluate.py  --gt ./data/Tracking_GT_TWO_SEQs --preds_dir ./preds/yolox
 
 ```python
 # example of the script
-$ python vis_utils/01.draw_bboxes.py --image_dir ./data/DET_COCO_STYLE_TWOs/ADDCURR/test --save_dir ./vis_output/gt --bbox_dir ./data/Tracking_GT_TWO_SEQs --ouput gt
-$ python vis_utils/01.draw_bboxes.py --image_dir ./data/DET_COCO_STYLE_TWOs/ADDCURR/test --save_dir ./vis_output/pred --bbox_dir ./preds/yolox_nano --ouput pred
+$ python vis_utils/01.draw_bboxes.py --image_dir ./data/DET_COCO_STYLE_TWOs/ADDCURR/test --save_dir ./vis_output/gt --bbox_dir ./data/Tracking_GT_TWO_SEQs --output gt
+$ python vis_utils/01.draw_bboxes.py --image_dir ./data/DET_COCO_STYLE_TWOs/ADDCURR/test --save_dir ./vis_output/pred --bbox_dir ./preds/yolox_nano --output pred
 ```
 
 ### 02.merge_gt_preds.py
@@ -137,5 +137,5 @@ $ python vis_utils/02.merge_gt_preds.py --gt ./vis_output/gt --pred ./vis_output
 
 ```python
 # example of the script
-$ python vis_utils/03.make_mp4.py --source ./vis_output/merge --fps 5 --out ./vis_output/outputs.mp4
+$ python vis_utils/03.make_mp4.py --source ./vis_output/merge --fps 10 --out ./vis_output/outputs.mp4
 ```

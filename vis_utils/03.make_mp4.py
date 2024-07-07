@@ -5,7 +5,7 @@ import argparse
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Train a model')
+    parser = argparse.ArgumentParser(description='Make movie file')
     parser.add_argument('--source', default='./vis_output/merge', help='the dir of images to be a movie')
     parser.add_argument('--fps', type=int, default=10, help='frame per second')
     parser.add_argument('--out', default='./vis_output/output.mp4', help='movie file name with path')

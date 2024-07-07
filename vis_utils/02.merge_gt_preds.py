@@ -5,7 +5,7 @@ import argparse
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Train a model')
+    parser = argparse.ArgumentParser(description='Merging gt and pred images')
     parser.add_argument('--save_dir', default='./vis_output/merge', help='the dir to save images with bboxes')
     parser.add_argument('--gt', default='./vis_output/gt', help='the dir of images with annotations on them')
     parser.add_argument('--pred', default='./vis_output/pred', help='the dir of images with predictions on thme')

@@ -5,10 +5,10 @@ import argparse
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Train a model')
-    parser.add_argument('--save_dir', default='./vis_output/gt', help='the dir to save images with bboxes')
+    parser = argparse.ArgumentParser(description='Draw Bounding Boxes and Trakcing ID')
+    parser.add_argument('--save_dir', default='./vis_output/gt', help='the dir to save output images with bboxes')
     parser.add_argument('--image_dir', default='./data/DET_COCO_STYLE_TWOs/ADDCURR/test/', help='the dir to have sequences of images for drawing bboxes')
-    parser.add_argument('--bbox_dir', default='./data/Tracking_GT_TWO_SEQs/', help='the dir having gt or preds of each videos') 
+    parser.add_argument('--bbox_dir', default='./data/Tracking_GT_TWO_SEQs/', help='the dir having gts or preds of each videos') 
     parser.add_argument('--output', default='gt', choices={'gt', 'pred'}, help='gt or pred')
     args = parser.parse_args()
     

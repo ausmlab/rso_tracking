@@ -51,7 +51,7 @@ def update_rso(obj, idx, bboxes, scores, img_id, img_file, obj_idx, tag) :
 
 def main():
     parser = argparse.ArgumentParser(description='Detect and Associate RSOs')
-    parser.add_argument('--score_th', default=0.3, type=float, help='score_th for detector')
+    parser.add_argument('--score_th', default=0.4, type=float, help='score_th for detector')
     parser.add_argument('--config', default='./config/yolox_nano_2seqs.py', help='config for mmdetection')
     parser.add_argument('--model', default='{path/to/mmdetection}/work_dirs/FAI_yolox_nano_2seqs/epoch_300.pth', help='trained detector model weights')
     parser.add_argument('--data', default='./data/DET_COCO_STYLE_TWOs/ADDCURR/test', help='the directory having test images')
@@ -174,7 +174,7 @@ def main():
     
             img_id += 1
                 
-        #print (video, len(objs))
+        print ('{}: {} objects are tracked'.format(video, len(objs)))
 
         out_path = os.path.join(OUTPUT_ROOT, video) 
         if not os.path.exists(out_path) :

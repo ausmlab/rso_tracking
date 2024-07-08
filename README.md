@@ -99,7 +99,7 @@ $ python tools/train.py  {path/to/rso_tracking}/config/yolox_nano_2seqs.py
 ```python
 # example of the script at root of rso_tracking
 $ cd {path/to/rso_tracking}
-$ python detection_with_tracking.py --score_th 0.3 --config config/yolox_nano_2seqs.py --model {path/to/mmdetection}/work_dirs/FAI_yolox_nano_2seqs/epoch_300.pth --data ./data/DET_COCO_STYLE_TWOs/ADDCURR/test --save_dir ./preds/yolox_nano
+$ python detection_with_tracking.py --score_th 0.4 --config config/yolox_nano_2seqs.py --model {path/to/mmdetection}/work_dirs/FAI_yolox_nano_2seqs/epoch_300.pth --data ./data/DET_COCO_STYLE_TWOs/ADDCURR/test --save_dir ./preds/yolox_nano
 ```
 
 # 4. Evaluation

@@ -77,7 +77,7 @@ model = dict(
         act_cfg=dict(type='Swish'),
         deepen_factor=0.33,
         init_cfg=dict(
-            checkpoint='/nas2/YJ/git/rso_tracking/yolox-nano/yolox_nano_mmdet.pth',
+            checkpoint=checkpoint,
             prefix='backbone.',
             type='Pretrained'),
         norm_cfg=dict(eps=0.001, momentum=0.03, type='BN'),

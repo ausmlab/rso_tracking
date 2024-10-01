@@ -11,6 +11,7 @@ class BDTracker(object):
         self.history_path = [img_file] # for img_file
         self.history_score = [score]
         self.status = 'in'
+        self.is_activated = False
 
     def update (self, img_id, img_file, bbox, score) :
         self.history_objservation.append(bbox) # for bbox

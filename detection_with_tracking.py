@@ -32,11 +32,14 @@ def get_indexes_for_valid_objs(objs, img_id) :
 def register_rso(objs, idxes, img_id, img_file, bboxes, scores) :
     for idx in idxes :
         new_obj = BDTracker(img_id, img_file, bboxes[idx], scores[idx])
+        if img_id == 0 :
+            new_obj.is_activated = True
         objs.append(new_obj)
     return objs
 
 
 def update_rso(obj, idx, bboxes, scores, img_id, img_file, obj_idx, tag) :
+    obj.is_activated = True
     obj.update(img_id, img_file, bboxes[idx], scores[idx])  # with new detection results
     # remove the selected one from scores and bboxes arrays
 
@@ -61,7 +64,7 @@ def main():
     
     model = init_detector(args.config, args.model, device='cpu')
     score_th = args.score_th
-    assumed_error_th = 5 # avg. half of max(height) and max(w) ## max(w) = 14, max(h) = 6 # error of being inside bbox
+    #assumed_error_th = 5 # avg. half of max(height) and max(w) ## max(w) = 14, max(h) = 6 # error of being inside bbox
 
     OUTPUT_ROOT = args.save_dir
     if not os.path.exists(OUTPUT_ROOT) :
@@ -123,10 +126,12 @@ def main():
                     # Velocity based detection and tracking regardless of score threshold
                     obj = objs[obj_vel_idx]
                     assumed_center = obj.forecast(img_id)
+                    vel_dist_th = np.max(np.average(np.array(obj.history_objservation)[:,2:], axis=0)) # since RSO's moving is not linear
                     if obj.history_id[-1]+1 == img_id :
                         # calc distance between assumed location and center of bboxes
                         dist_errors = pairwise_distances(assumed_center, bboxes[:,:2], metric='euclidean')[0]
-                        low_dist_idxes = np.where(dist_errors < assumed_error_th)[0]
+                        low_dist_idxes = np.where(dist_errors < vel_dist_th)[0]
+                        #low_dist_idxes = np.where(dist_errors < assumed_error_th)[0]
                         if len(low_dist_idxes) !=  0 :
                             max_idx = np.min(low_dist_idxes) # get index of highest score
                             bboxes, scores = update_rso(obj, max_idx, bboxes, scores, img_id, img_file, obj_vel_idx, 'Vel')
@@ -138,7 +143,8 @@ def main():
                         if score_idxes.shape[0] != 0 :
                             dists = pairwise_distances(assumed_center, bboxes[:, :2][score_idxes], metric='euclidean') # 1,N
                             min_dist = np.min(dists, axis=1)
-                            if min_dist < assumed_error_th :
+                            if min_dist < vel_dist_th : # * (img_id - obj.history_id[-1]) :
+                            #if min_dist < assumed_error_th :
                                 min_idx = score_idxes[np.argmin(dists, axis=1)][0]
                                 bboxes, scores = update_rso(obj, min_idx, bboxes, scores, img_id, img_file, obj_vel_idx, 'VS&D')
                 
@@ -157,12 +163,13 @@ def main():
                         # register all new objs
                         objs = register_rso(objs, hi_score_idxes, img_id, img_file, bboxes, scores)
     
-                    else :
+                    else : ###<----------------------------------------------------------------
                         preds_centers = bboxes[:, :2][hi_score_idxes]
                         dist = pairwise_distances(objs_centers, preds_centers, metric='euclidean')
                         obj_idxes, pred_idxes = linear_sum_assignment(dist) # Hungarian Algorithm
                         new_objs_idx = hi_score_idxes.tolist()
                         for obj_idx, pred_idx in zip(obj_idxes, pred_idxes) :
+                            #if dist[obj_idx, pred_idx] < 25 :
                             obj_idx = obj_novel_idxes[obj_idx]
                             pred_idx = hi_score_idxes[pred_idx]
                             update_rso(objs[obj_idx], pred_idx, bboxes, scores, img_id, img_file, obj_idx, 'TbD')
@@ -181,14 +188,15 @@ def main():
             os.makedirs(out_path)
         with open(os.path.join(out_path, 'pred.txt'), 'w') as f :
             for n, obj in enumerate(objs) :
-                for i in range(len(obj.history_id)) :
-                    img_id = obj.history_id[i] + 1
-                    obj_id = n+1
-                    cx, cy, width, height = obj.history_objservation[i]
-                    minx = cx - width/2
-                    miny = cy - height/2
-                    conf = obj.history_score[i] * 100.
-                    f.write('{},{},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},-1,-1,-1\n'.format(img_id, obj_id, minx, miny, width, height, conf))
+                if obj.is_activated :
+                    for i in range(len(obj.history_id)) :
+                        img_id = obj.history_id[i] + 1
+                        obj_id = n+1
+                        cx, cy, width, height = obj.history_objservation[i]
+                        minx = cx - width/2
+                        miny = cy - height/2
+                        conf = obj.history_score[i] * 100.
+                        f.write('{},{},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},-1,-1,-1\n'.format(img_id, obj_id, minx, miny, width, height, conf))
 
 
 if __name__ == '__main__':
